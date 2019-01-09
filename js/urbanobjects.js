@@ -35,11 +35,12 @@ scene.add(cube);
 camera.position.z = 5;
 
 // Load the background texture
-var texture = THREE.ImageUtils.loadTexture('img/parkinglot.jpg');
+const loader = new THREE.TextureLoader();
+const backgroundImageTexture = loader.load('img/parkinglot.jpg');
 var backgroundMesh = new THREE.Mesh(
  new THREE.PlaneGeometry(2, 2, 0),
  new THREE.MeshBasicMaterial({
-   map: texture
+   map: backgroundImageTexture,
 }));
 
 backgroundMesh.material.depthTest = false;
@@ -65,7 +66,7 @@ var render = function () {
 
   // set position topcode value
   const topcodes = getTopCodesList().getTopCodes();
-  console.log("TopCodes", topcodes);
+  // console.log("TopCodes", topcodes);
   if (topcodes.length > 0) {
    const containerWidth = 1179;
    const containerHeight = 750;
