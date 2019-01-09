@@ -56,19 +56,16 @@ var render = function () {
 
       let topcodePosX = topcode.x;
       let topcodePosY = topcode.y;
-      console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
 
       let relativeX = (topcodePosX * window.innerWidth) / videoCanvas.width;
       let relativeY = (topcodePosY * window.innerHeight) / videoCanvas.height;
-      console.log("Relative X", relativeX);
 
-      let scaledX = scaleToRange(relativeX, 0, 400, -5, 3);
-      let scaledSize = scaleToRange(relativeY, 0, 300, 0.1, 3);
+      let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 2, -5);
+      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1);
 
-      console.log(scaledX);
+      console.log("Scaled X", scaledX);
       console.log(scaledSize);
 
-      console.log(topcode.code);
       let object = urbanObjects.get(topcode.code);
       if (!object) {
         object = addNewObject(scene);
@@ -118,5 +115,16 @@ function addNewObject(scene) {
 }
 
 function scaleToRange(num, inMin, inMax, outMin, outMax) {
-  return (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+  const scaledValue = (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+
+  const highestOut = outMax > outMin ? outMax : outMin;
+  const lowestOut = outMin < outMax ? outMin : outMax;
+
+  if (scaledValue > highestOut) {
+    return highestOut;
+  } else if (scaledValue < lowestOut) {
+    return lowestOut;
+  }
+
+  return scaledValue;
 }
