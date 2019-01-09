@@ -1,3 +1,4 @@
+// Define globally useful maps
 const urbanObjects = new Map();
 const preloadedObjects = new Map();
 const codeToObjectMap = {
@@ -5,6 +6,12 @@ const codeToObjectMap = {
   '1189': 'bike',
   '421': 'cube',
 }
+
+// Define relevant loaders
+const textureLoader = new THREE.TextureLoader();
+const stlLoader = new THREE.STLLoader();
+const objLoader = new THREE.OBJLoader();
+const mtlLoader = new THREE.MTLLoader();
 
 // Cube
 const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -19,8 +26,7 @@ preloadedObjects.set('cube', {
 });
 
 // Bat Mobile
-const stlLoader = new THREE.STLLoader();
-stlLoader.load('models/bat11.stl', function (geometry) {
+stlLoader.load('models/bat11.stl', function(geometry) {
   var material = new THREE.MeshPhongMaterial({
     color: 0xff5533,
     specular: 0x111111,
@@ -31,8 +37,16 @@ stlLoader.load('models/bat11.stl', function (geometry) {
   mesh.castShadow = true;
   mesh.receiveShadow = true;
 
-  preloadedObjects.set('bike', {objectMesh: mesh, scalingFactor: 0.01});
   preloadedObjects.set('tree', {objectMesh: mesh, scalingFactor: 0.01});
+});
+
+// Bike
+mtlLoader.load("models/bike.mtl", function(materials) {
+  materials.preload();
+  objLoader.setMaterials(materials);
+  objLoader.load('models/bike.obj', function(objectMesh) {
+    preloadedObjects.set('bike', {objectMesh: objectMesh, scalingFactor: 0.002});
+  });
 });
 
 var color = 0x000000;
@@ -45,11 +59,20 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 
 // Create lights
 var light = new THREE.PointLight(0xEEEEEE);
-light.position.set(20, 0, 20);
-scene.add(light);
-
 var lightAmb = new THREE.AmbientLight(0x777777);
+var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.50);
+var dirLight = new THREE.DirectionalLight(0xffffff, 0.50);
+
+light.position.set(20, 0, 20);
+lightAmb.position.set(20, 0, 20);
+hemiLight.position.set(20, 0, 20);
+dirLight.position.set(20, 0, 20);
+
+scene.add(light);
 scene.add(lightAmb);
+scene.add(hemiLight);
+scene.add(dirLight);
+
 
 // Create your renderer
 var renderer = new THREE.WebGLRenderer();
@@ -61,8 +84,7 @@ container.appendChild(renderer.domElement);
 camera.position.z = 5;
 
 // Load the background texture
-const loader = new THREE.TextureLoader();
-const backgroundImageTexture = loader.load('img/parkinglot.jpg');
+const backgroundImageTexture = textureLoader.load('img/parkinglot.jpg');
 var backgroundMesh = new THREE.Mesh(
  new THREE.PlaneGeometry(2, 2, 0),
  new THREE.MeshBasicMaterial({
