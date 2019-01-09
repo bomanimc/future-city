@@ -64,7 +64,7 @@ var render = function () {
   cube.material.color.setHex(color);
 
   // set position topcode value
-  const topcodes = getTopCodes();
+  const topcodes = getTopCodesList().getTopCodes();
   console.log("TopCodes", topcodes);
   if (topcodes.length > 0) {
    const containerWidth = 1179;
