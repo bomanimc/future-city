@@ -5,7 +5,11 @@ const codeToObjectMap = {
   '563': 'tree',
   '361': 'bike',
   '421': 'tricycle',
-  '313': 'beagle',
+  '271': 'pug',
+  '313': 'seasaw',
+  '203': 'bench',
+  '155': 'coffee_shop',
+  '563': 'food_stand',
 }
 
 // Key DOM Elements
@@ -36,7 +40,6 @@ scene.add(light);
 scene.add(lightAmb);
 scene.add(hemiLight);
 scene.add(dirLight);
-
 
 // Create your renderer
 var renderer = new THREE.WebGLRenderer();
@@ -75,6 +78,7 @@ var render = function () {
     for (let i = 0; i < topcodes.length; i++) {
       const topcode = topcodes[i];
       const code = topcode.code;
+      const objectType = codeToObjectMap[code.toString()];
 
       let topcodePosX = topcode.x;
       let topcodePosY = topcode.y;
@@ -82,20 +86,21 @@ var render = function () {
       let relativeX = (topcodePosX * threeContainerWidth) / videoCanvas.width;
       let relativeY = (topcodePosY * threeContainerHeight) / videoCanvas.height;
 
-      const preloadedObject = preloadedObjects.get(
-        codeToObjectMap[code.toString()]
-      );
-      const scalingFactor = preloadedObject.scalingFactor;
+      const preloadedObject = preloadedObjects.get(objectType);
+      let scalingFactor = 0;
+      if (preloadedObject) {
+        scalingFactor = preloadedObject.scalingFactor;
+      }
 
       let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 2, -5);
       let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1) * scalingFactor;
 
-      console.log("Scaled X", scaledX);
-      console.log("Scaled Size", scaledSize);
+      // console.log("Scaled X", scaledX);
+      // console.log("Scaled Size", scaledSize);
 
       let object = urbanObjects.get(code);
       if (!object) {
-        object = addNewObject(scene, code);
+        object = addNewObject(scene, objectType);
         urbanObjects.set(code, object);
       }
 
@@ -129,9 +134,7 @@ setInterval(function() {
   });
 }, 500);
 
-function addNewObject(scene, code) {
-  let mesh = null;
-  const objectType = codeToObjectMap[code.toString()];
+function addNewObject(scene, objectType) {
   const objectMesh = preloadedObjects.get(objectType).objectMesh;
 
   scene.add(objectMesh);
@@ -176,27 +179,64 @@ function preloadObjects() {
     });
   });
 
-  // Beagle
-  const beagleMTLLoader = new THREE.MTLLoader();
-  const beagleOBJLoader = new THREE.OBJLoader();
-  beagleMTLLoader.load("models/beagle/Mesh_Beagle.mtl", function(materials) {
+  // Pug
+  const pugMTLLoader = new THREE.MTLLoader();
+  const pugOBJLoader = new THREE.OBJLoader();
+  pugMTLLoader.load("models/pug/pug.mtl", function(materials) {
     materials.preload();
-    beagleOBJLoader.setMaterials(materials);
-    beagleOBJLoader.load('models/beagle/beagle.obj', function(objectMesh) {
-      preloadedObjects.set('beagle', {objectMesh: objectMesh, scalingFactor: 0.005});
+    pugOBJLoader.setMaterials(materials);
+    pugOBJLoader.load('models/pug/pug.obj', function(objectMesh) {
+      preloadedObjects.set('pug', {objectMesh: objectMesh, scalingFactor: 1});
     });
   });
 
-  // // Treasure Chest
-  // const chestMTLLoader = new THREE.MTLLoader();
-  // const chestOBJLoader = new THREE.OBJLoader();
-  // chestMTLLoader.load("models/treasure_chest/treasure_chest.mtl", function(materials) {
-  //   materials.preload();
-  //   chestOBJLoader.setMaterials(materials);
-  //   chestOBJLoader.load('models/treasure_chest/treasure_chest.obj', function(objectMesh) {
-  //     preloadedObjects.set('chest', {objectMesh: objectMesh, scalingFactor: 1});
-  //   });
-  // });
+  // Seesaw
+  const seesawMTLLoader = new THREE.MTLLoader();
+  const seesawOBJLoader = new THREE.OBJLoader();
+  seesawMTLLoader.load("models/seasaw/seasaw.mtl", function(materials) {
+    materials.preload();
+    seesawOBJLoader.setMaterials(materials);
+    seesawOBJLoader.load('models/seasaw/seasaw.obj', function(objectMesh) {
+      preloadedObjects.set('seasaw', {objectMesh: objectMesh, scalingFactor: 0.1});
+    });
+  });
+
+  // Bench
+  const benchMTLLoader = new THREE.MTLLoader();
+  const benchOBJLoader = new THREE.OBJLoader();
+  benchMTLLoader.load("models/bench/bench.mtl", function(materials) {
+    materials.preload();
+    benchOBJLoader.setMaterials(materials);
+    benchOBJLoader.load('models/bench/bench.obj', function(objectMesh) {
+      preloadedObjects.set('bench', {
+        objectMesh: objectMesh,
+        scalingFactor: 1,
+        rotationY: Math.PI,
+      });
+    });
+  });
+
+  // Coffee Shop
+  const coffeeShopMTLLoader = new THREE.MTLLoader();
+  const coffeeShopOBJLoader = new THREE.OBJLoader();
+  coffeeShopMTLLoader.load("models/coffee_shop/coffee_shop.mtl", function(materials) {
+    materials.preload();
+    coffeeShopOBJLoader.setMaterials(materials);
+    coffeeShopOBJLoader.load('models/coffee_shop/coffee_shop.obj', function(objectMesh) {
+      preloadedObjects.set('coffee_shop', {objectMesh: objectMesh, scalingFactor: 1, rotationY: Math.PI});
+    });
+  });
+
+  // Food Stand
+  const foodStandMTLLoader = new THREE.MTLLoader();
+  const foodStandOBJLoader = new THREE.OBJLoader();
+  foodStandMTLLoader.load("models/food_stand/food_stand.mtl", function(materials) {
+    materials.preload();
+    foodStandOBJLoader.setMaterials(materials);
+    foodStandOBJLoader.load('models/food_stand/food_stand.obj', function(objectMesh) {
+      preloadedObjects.set('food_stand', {objectMesh: objectMesh, scalingFactor: 1});
+    });
+  });
 }
 
 function scaleToRange(num, inMin, inMax, outMin, outMax) {
