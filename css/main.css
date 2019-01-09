@@ -15,8 +15,8 @@ html, body {
 
 #video-canvas {
   position: absolute;
-  width: 600px;
-  height: 400px;
+  width: 225px;
+  height: 150px;
   bottom: 8px;
   right: 8px;
 }

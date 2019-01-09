@@ -3,9 +3,13 @@ const urbanObjects = new Map();
 const preloadedObjects = new Map();
 const codeToObjectMap = {
   '563': 'tree',
-  '1189': 'bike',
+  '361': 'bike',
   '421': 'cube',
 }
+
+// Key DOM Elements
+const videoCanvas = document.getElementById('video-canvas');
+const container = document.getElementById('three-container');
 
 // Define relevant loaders
 const textureLoader = new THREE.TextureLoader();
@@ -25,31 +29,23 @@ preloadedObjects.set('cube', {
   scalingFactor: 1,
 });
 
-// Bat Mobile
-stlLoader.load('models/bat11.stl', function(geometry) {
-  var material = new THREE.MeshPhongMaterial({
-    color: 0xff5533,
-    specular: 0x111111,
-    shininess: 200,
-  });
-  mesh = new THREE.Mesh( geometry, material );
-
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-
-  preloadedObjects.set('tree', {objectMesh: mesh, scalingFactor: 0.01});
-});
-
 // Bike
-mtlLoader.load("models/bike.mtl", function(materials) {
+mtlLoader.load("models/bike/bike.mtl", function(materials) {
   materials.preload();
   objLoader.setMaterials(materials);
-  objLoader.load('models/bike.obj', function(objectMesh) {
+  objLoader.load('models/bike/bike.obj', function(objectMesh) {
     preloadedObjects.set('bike', {objectMesh: objectMesh, scalingFactor: 0.002});
   });
 });
 
-var color = 0x000000;
+// Tree
+mtlLoader.load("models/tree/tree.mtl", function(materials) {
+  materials.preload();
+  objLoader.setMaterials(materials);
+  objLoader.load('models/tree/tree.obj', function(objectMesh) {
+    preloadedObjects.set('tree', {objectMesh: objectMesh, scalingFactor: 0.002});
+  });
+});
 
 // Create your main scene
 var scene = new THREE.Scene();
@@ -76,15 +72,16 @@ scene.add(dirLight);
 
 // Create your renderer
 var renderer = new THREE.WebGLRenderer();
-const container = document.getElementById('three-container');
-renderer.setSize(window.innerWidth, window.innerHeight);
+const threeContainerWidth = container.offsetWidth;
+const threeContainerHeight = container.offsetHeight;
+renderer.setSize(threeContainerWidth, threeContainerHeight);
 container.appendChild(renderer.domElement);
 
 // Set up the main camera
 camera.position.z = 5;
 
 // Load the background texture
-const backgroundImageTexture = textureLoader.load('img/parkinglot.jpg');
+const backgroundImageTexture = textureLoader.load('img/pier.jpg');
 var backgroundMesh = new THREE.Mesh(
  new THREE.PlaneGeometry(2, 2, 0),
  new THREE.MeshBasicMaterial({
@@ -100,8 +97,6 @@ var backgroundCamera = new THREE.Camera();
 backgroundScene.add(backgroundCamera);
 backgroundScene.add(backgroundMesh);
 
-const videoCanvas = document.getElementById('video-canvas');
-
 // Rendering function
 var render = function () {
   requestAnimationFrame(render);
@@ -115,8 +110,8 @@ var render = function () {
       let topcodePosX = topcode.x;
       let topcodePosY = topcode.y;
 
-      let relativeX = (topcodePosX * window.innerWidth) / videoCanvas.width;
-      let relativeY = (topcodePosY * window.innerHeight) / videoCanvas.height;
+      let relativeX = (topcodePosX * threeContainerWidth) / videoCanvas.width;
+      let relativeY = (topcodePosY * threeContainerHeight) / videoCanvas.height;
 
       const scalingFactor = preloadedObjects.get(
         codeToObjectMap[code.toString()]
@@ -134,7 +129,7 @@ var render = function () {
         object = addNewObject(scene, code);
         urbanObjects.set(code, object);
       }
-
+      
       object.position.setX(scaledX);
       object.scale.set(scaledSize, scaledSize, scaledSize);
     }
