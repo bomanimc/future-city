@@ -1,4 +1,5 @@
 let topCodesList = new TopCodesList([]);
+TopCodes.startStopVideoScan('video-canvas');
 
 // register a callback function with the TopCode library
 TopCodes.setVideoFrameCallback("video-canvas", function(jsonString) {

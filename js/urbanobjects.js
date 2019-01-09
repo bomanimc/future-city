@@ -4,48 +4,16 @@ const preloadedObjects = new Map();
 const codeToObjectMap = {
   '563': 'tree',
   '361': 'bike',
-  '421': 'cube',
+  '421': 'tricycle',
+  '313': 'beagle',
 }
 
 // Key DOM Elements
 const videoCanvas = document.getElementById('video-canvas');
 const container = document.getElementById('three-container');
 
-// Define relevant loaders
-const textureLoader = new THREE.TextureLoader();
-const stlLoader = new THREE.STLLoader();
-const objLoader = new THREE.OBJLoader();
-const mtlLoader = new THREE.MTLLoader();
-
-// Cube
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshLambertMaterial({
-   color: 0xff00ff,
-   ambient: 0x121212,
-   emissive: 0x121212
-});
-preloadedObjects.set('cube', {
-  objectMesh: new THREE.Mesh(geometry, material),
-  scalingFactor: 1,
-});
-
-// Bike
-mtlLoader.load("models/bike/bike.mtl", function(materials) {
-  materials.preload();
-  objLoader.setMaterials(materials);
-  objLoader.load('models/bike/bike.obj', function(objectMesh) {
-    preloadedObjects.set('bike', {objectMesh: objectMesh, scalingFactor: 0.002});
-  });
-});
-
-// Tree
-mtlLoader.load("models/tree/tree.mtl", function(materials) {
-  materials.preload();
-  objLoader.setMaterials(materials);
-  objLoader.load('models/tree/tree.obj', function(objectMesh) {
-    preloadedObjects.set('tree', {objectMesh: objectMesh, scalingFactor: 0.002});
-  });
-});
+// Preload objects
+preloadObjects();
 
 // Create your main scene
 var scene = new THREE.Scene();
@@ -81,6 +49,7 @@ container.appendChild(renderer.domElement);
 camera.position.z = 5;
 
 // Load the background texture
+const textureLoader = new THREE.TextureLoader();
 const backgroundImageTexture = textureLoader.load('img/pier.jpg');
 var backgroundMesh = new THREE.Mesh(
  new THREE.PlaneGeometry(2, 2, 0),
@@ -113,10 +82,10 @@ var render = function () {
       let relativeX = (topcodePosX * threeContainerWidth) / videoCanvas.width;
       let relativeY = (topcodePosY * threeContainerHeight) / videoCanvas.height;
 
-      const scalingFactor = preloadedObjects.get(
+      const preloadedObject = preloadedObjects.get(
         codeToObjectMap[code.toString()]
-      ).scalingFactor;
-      console.log("Scaling", scalingFactor);
+      );
+      const scalingFactor = preloadedObject.scalingFactor;
 
       let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 2, -5);
       let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1) * scalingFactor;
@@ -129,8 +98,11 @@ var render = function () {
         object = addNewObject(scene, code);
         urbanObjects.set(code, object);
       }
-      
+
       object.position.setX(scaledX);
+      if ('rotationY' in preloadedObject) {
+        object.rotation.y = preloadedObject.rotationY;
+      }
       object.scale.set(scaledSize, scaledSize, scaledSize);
     }
   }
@@ -164,6 +136,67 @@ function addNewObject(scene, code) {
 
   scene.add(objectMesh);
   return objectMesh;
+}
+
+function preloadObjects() {
+  // Bike
+  const bikeMTLLoader = new THREE.MTLLoader();
+  const bikeOBJLoader = new THREE.OBJLoader();
+  bikeMTLLoader.load("models/bike/bike.mtl", function(materials) {
+    materials.preload();
+    bikeOBJLoader.setMaterials(materials);
+    bikeOBJLoader.load('models/bike/bike.obj', function(objectMesh) {
+      preloadedObjects.set('bike', {objectMesh: objectMesh, scalingFactor: 0.002});
+    });
+  });
+
+  // Tree
+  const treeMTLLoader = new THREE.MTLLoader();
+  const treeOBJLoader = new THREE.OBJLoader();
+  treeMTLLoader.load("models/tree/tree.mtl", function(materials) {
+    materials.preload();
+    treeOBJLoader.setMaterials(materials);
+    treeOBJLoader.load('models/tree/tree.obj', function(objectMesh) {
+      preloadedObjects.set('tree', {objectMesh: objectMesh, scalingFactor: 0.002});
+    });
+  });
+
+  // Tricycle
+  const tricycleMTLLoader = new THREE.MTLLoader();
+  const tricycleOBJLoader = new THREE.OBJLoader();
+  tricycleMTLLoader.load("models/tricycle/tricycle.mtl", function(materials) {
+    materials.preload();
+    tricycleOBJLoader.setMaterials(materials);
+    tricycleOBJLoader.load('models/tricycle/tricycle.obj', function(objectMesh) {
+      preloadedObjects.set('tricycle', {
+        objectMesh: objectMesh,
+        scalingFactor: 1,
+        rotationY: Math.PI,
+      });
+    });
+  });
+
+  // Beagle
+  const beagleMTLLoader = new THREE.MTLLoader();
+  const beagleOBJLoader = new THREE.OBJLoader();
+  beagleMTLLoader.load("models/beagle/Mesh_Beagle.mtl", function(materials) {
+    materials.preload();
+    beagleOBJLoader.setMaterials(materials);
+    beagleOBJLoader.load('models/beagle/beagle.obj', function(objectMesh) {
+      preloadedObjects.set('beagle', {objectMesh: objectMesh, scalingFactor: 0.005});
+    });
+  });
+
+  // // Treasure Chest
+  // const chestMTLLoader = new THREE.MTLLoader();
+  // const chestOBJLoader = new THREE.OBJLoader();
+  // chestMTLLoader.load("models/treasure_chest/treasure_chest.mtl", function(materials) {
+  //   materials.preload();
+  //   chestOBJLoader.setMaterials(materials);
+  //   chestOBJLoader.load('models/treasure_chest/treasure_chest.obj', function(objectMesh) {
+  //     preloadedObjects.set('chest', {objectMesh: objectMesh, scalingFactor: 1});
+  //   });
+  // });
 }
 
 function scaleToRange(num, inMin, inMax, outMin, outMax) {
