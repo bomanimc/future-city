@@ -16,8 +16,8 @@
 
  // Create your renderer
  var renderer = new THREE.WebGLRenderer();
- renderer.setSize(window.innerWidth, window.innerHeight);
  const container = document.getElementById('three-container');
+ renderer.setSize(window.innerWidth, window.innerHeight);
  container.appendChild(renderer.domElement);
 
  // Create a cube
@@ -51,6 +51,8 @@
  backgroundScene.add(backgroundCamera );
  backgroundScene.add(backgroundMesh );
 
+ const videoCanvas = document.getElementById('video-canvas');
+
  // Rendering function
  var render = function () {
      requestAnimationFrame(render);
@@ -60,6 +62,26 @@
 
      // Update the cube color
      cube.material.color.setHex(color);
+
+     // set position topcode value
+     const topcodes = getTopCodes();
+     console.log("TopCodes", topcodes);
+     if (topcodes.length > 0) {
+       const containerWidth = 1179;
+       const topcode = topcodes[0];
+
+       console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
+       console.log(`Video Width: ${videoCanvas.width}, Container Width: ${containerWidth}`);
+
+       let topcodePosX = topcode.x;
+       let topcodePosY = topcode.y;
+
+       let relativeX = (topcodePosX * containerWidth) / videoCanvas.width;
+       console.log("Relative X", relativeX);
+       let scaledX = scale(relativeX, 0, 400, -3, 3);
+       console.log(scaledX);
+       cube.position.setX(scaledX);
+     }
 
      // Update the cube rotations
      cube.rotation.x += 0.05;
@@ -72,3 +94,7 @@
 };
 
 render();
+
+function scale(num, in_min, in_max, out_min, out_max) {
+  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
