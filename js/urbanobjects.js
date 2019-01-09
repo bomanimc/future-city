@@ -9,7 +9,7 @@ const codeToObjectMap = {
   '313': 'seasaw',
   '203': 'bench',
   '155': 'coffee_shop',
-  '563': 'food_stand',
+  '91': 'food_stand',
 }
 
 // Key DOM Elements
