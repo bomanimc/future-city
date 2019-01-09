@@ -1,3 +1,5 @@
+const urbanObjects = new Map();
+
 var color = 0x000000;
 
 // Create your main scene
@@ -19,17 +21,6 @@ var renderer = new THREE.WebGLRenderer();
 const container = document.getElementById('three-container');
 renderer.setSize(window.innerWidth, window.innerHeight);
 container.appendChild(renderer.domElement);
-
-// Create a cube
-var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshLambertMaterial({
-   color: 0xff00ff,
-   ambient: 0x121212,
-   emissive: 0x121212
-});
-
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
 
 // Set up the main camera
 camera.position.z = 5;
@@ -58,43 +49,36 @@ const videoCanvas = document.getElementById('video-canvas');
 var render = function () {
   requestAnimationFrame(render);
 
-  // Update the color to set
-  if (color < 0xdddddd) color += 0x0000ff;
-
-  // Update the cube color
-  cube.material.color.setHex(color);
-
-  // set position topcode value
   const topcodes = getTopCodesList().getTopCodes();
-  // console.log("TopCodes", topcodes);
   if (topcodes.length > 0) {
-   const containerWidth = 1179;
-   const containerHeight = 750;
-   const topcode = topcodes[0];
+    for (let i = 0; i < topcodes.length; i++) {
+      const topcode = topcodes[i];
 
-   let topcodePosX = topcode.x;
-   let topcodePosY = topcode.y;
+      let topcodePosX = topcode.x;
+      let topcodePosY = topcode.y;
+      console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
 
-   console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
-   console.log(`Video Width: ${videoCanvas.width}, Container Width: ${containerWidth}`);
+      let relativeX = (topcodePosX * window.innerWidth) / videoCanvas.width;
+      let relativeY = (topcodePosY * window.innerHeight) / videoCanvas.height;
+      console.log("Relative X", relativeX);
 
-   let relativeX = (topcodePosX * containerWidth) / videoCanvas.width;
-   let relativeY = (topcodePosY * containerHeight) / videoCanvas.height;
-   console.log("Relative X", relativeX);
+      let scaledX = scaleToRange(relativeX, 0, 400, -5, 3);
+      let scaledSize = scaleToRange(relativeY, 0, 300, 0.1, 3);
 
-   let scaledX = scale(relativeX, 0, 400, -3, 3);
-   let scaledSize = scale(relativeY, 0, 300, 0.1, 3);
+      console.log(scaledX);
+      console.log(scaledSize);
 
-   console.log(scaledX);
-   console.log(scaledSize);
+      console.log(topcode.code);
+      let object = urbanObjects.get(topcode.code);
+      if (!object) {
+        object = addNewObject(scene);
+        urbanObjects.set(topcode.code, object);
+      }
 
-   cube.position.setX(scaledX);
-   cube.scale.set(scaledSize, scaledSize, scaledSize);
+      object.position.setX(scaledX);
+      object.scale.set(scaledSize, scaledSize, scaledSize);
+    }
   }
-
-  // Update the cube rotations
-  cube.rotation.x += 0.05;
-  cube.rotation.y += 0.02;
 
   renderer.autoClear = false;
   renderer.clear();
@@ -104,6 +88,35 @@ var render = function () {
 
 render();
 
-function scale(num, in_min, in_max, out_min, out_max) {
-  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+// Clean up the urbanObjects map to remove any objects that were placed by
+// incorrect topcode readings. Rather than doing this in the draw loop, we can
+// do it here to reduce flickering when the code tracking is temporarily lost.
+setInterval(function() {
+  const topcodes = getTopCodesList().getTopCodes();
+  const currentCodes = topcodes.map(topcode => topcode.code);
+  Array.from(urbanObjects.keys()).map(code => {
+    if (!currentCodes.includes(code)) {
+      scene.remove(urbanObjects.get(code));
+      urbanObjects.delete(code);
+    }
+  });
+}, 500);
+
+function addNewObject(scene) {
+  // Create a cube
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshLambertMaterial({
+     color: 0xff00ff,
+     ambient: 0x121212,
+     emissive: 0x121212
+  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  return cube;
+}
+
+function scaleToRange(num, inMin, inMax, outMin, outMax) {
+  return (num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
