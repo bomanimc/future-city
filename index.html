@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>TopCodes Example</title>
-</head>
+  <head>
+    <title>TopCodes Example</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+  </head>
 
-<body>
-  <canvas id="video-canvas" width="800" height="600" style="background: #ddd;"></canvas>
-  <br/>
-  <button id="camera-button" onclick="TopCodes.startStopVideoScan('video-canvas')">Start / Stop</button>
-
+  <body>
+    <div id="three-container"></div>
+    <canvas id="video-canvas" width="200" height="150" style="background: #ddd;"></canvas>
+    <button id="camera-button" onclick="TopCodes.startStopVideoScan('video-canvas')">Start / Stop</button>
+  </body>
+  <script src="js/lib/three.js"></script>
   <script src="js/topcodes.js"></script>
+  <script src="js/urbanobjects.js"></script>
   <script>
 
     // register a callback function with the TopCode library
@@ -35,5 +38,4 @@
 
     });
   </script>
-</body>
 </html>
