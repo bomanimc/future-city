@@ -1,4 +1,39 @@
 const urbanObjects = new Map();
+const preloadedObjects = new Map();
+const codeToObjectMap = {
+  '563': 'tree',
+  '1189': 'bike',
+  '421': 'cube',
+}
+
+// Cube
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshLambertMaterial({
+   color: 0xff00ff,
+   ambient: 0x121212,
+   emissive: 0x121212
+});
+preloadedObjects.set('cube', {
+  objectMesh: new THREE.Mesh(geometry, material),
+  scalingFactor: 1,
+});
+
+// Bat Mobile
+const stlLoader = new THREE.STLLoader();
+stlLoader.load('models/bat11.stl', function (geometry) {
+  var material = new THREE.MeshPhongMaterial({
+    color: 0xff5533,
+    specular: 0x111111,
+    shininess: 200,
+  });
+  mesh = new THREE.Mesh( geometry, material );
+
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
+  preloadedObjects.set('bike', {objectMesh: mesh, scalingFactor: 0.01});
+  preloadedObjects.set('tree', {objectMesh: mesh, scalingFactor: 0.01});
+});
 
 var color = 0x000000;
 
@@ -53,6 +88,7 @@ var render = function () {
   if (topcodes.length > 0) {
     for (let i = 0; i < topcodes.length; i++) {
       const topcode = topcodes[i];
+      const code = topcode.code;
 
       let topcodePosX = topcode.x;
       let topcodePosY = topcode.y;
@@ -60,16 +96,21 @@ var render = function () {
       let relativeX = (topcodePosX * window.innerWidth) / videoCanvas.width;
       let relativeY = (topcodePosY * window.innerHeight) / videoCanvas.height;
 
+      const scalingFactor = preloadedObjects.get(
+        codeToObjectMap[code.toString()]
+      ).scalingFactor;
+      console.log("Scaling", scalingFactor);
+
       let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 2, -5);
-      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1);
+      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1) * scalingFactor;
 
       console.log("Scaled X", scaledX);
-      console.log(scaledSize);
+      console.log("Scaled Size", scaledSize);
 
-      let object = urbanObjects.get(topcode.code);
+      let object = urbanObjects.get(code);
       if (!object) {
-        object = addNewObject(scene);
-        urbanObjects.set(topcode.code, object);
+        object = addNewObject(scene, code);
+        urbanObjects.set(code, object);
       }
 
       object.position.setX(scaledX);
@@ -99,19 +140,13 @@ setInterval(function() {
   });
 }, 500);
 
-function addNewObject(scene) {
-  // Create a cube
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshLambertMaterial({
-     color: 0xff00ff,
-     ambient: 0x121212,
-     emissive: 0x121212
-  });
+function addNewObject(scene, code) {
+  let mesh = null;
+  const objectType = codeToObjectMap[code.toString()];
+  const objectMesh = preloadedObjects.get(objectType).objectMesh;
 
-  const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
-
-  return cube;
+  scene.add(objectMesh);
+  return objectMesh;
 }
 
 function scaleToRange(num, inMin, inMax, outMin, outMax) {
