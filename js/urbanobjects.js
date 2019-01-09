@@ -68,19 +68,27 @@ var render = function () {
   console.log("TopCodes", topcodes);
   if (topcodes.length > 0) {
    const containerWidth = 1179;
+   const containerHeight = 750;
    const topcode = topcodes[0];
-
-   console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
-   console.log(`Video Width: ${videoCanvas.width}, Container Width: ${containerWidth}`);
 
    let topcodePosX = topcode.x;
    let topcodePosY = topcode.y;
 
+   console.log(`TopCode X: ${topcodePosX}, TopCode Y: ${topcodePosY}`);
+   console.log(`Video Width: ${videoCanvas.width}, Container Width: ${containerWidth}`);
+
    let relativeX = (topcodePosX * containerWidth) / videoCanvas.width;
+   let relativeY = (topcodePosY * containerHeight) / videoCanvas.height;
    console.log("Relative X", relativeX);
+
    let scaledX = scale(relativeX, 0, 400, -3, 3);
+   let scaledSize = scale(relativeY, 0, 300, 0.1, 3);
+
    console.log(scaledX);
+   console.log(scaledSize);
+
    cube.position.setX(scaledX);
+   cube.scale.set(scaledSize, scaledSize, scaledSize);
   }
 
   // Update the cube rotations
