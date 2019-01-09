@@ -28,18 +28,14 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 // Create lights
 var light = new THREE.PointLight(0xEEEEEE);
 var lightAmb = new THREE.AmbientLight(0x777777);
-var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.50);
-var dirLight = new THREE.DirectionalLight(0xffffff, 0.50);
+var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.25);
 
 light.position.set(20, 0, 20);
 lightAmb.position.set(20, 0, 20);
-hemiLight.position.set(20, 0, 20);
-dirLight.position.set(20, 0, 20);
 
 scene.add(light);
 scene.add(lightAmb);
 scene.add(hemiLight);
-scene.add(dirLight);
 
 // Create your renderer
 var renderer = new THREE.WebGLRenderer();
@@ -142,99 +138,33 @@ function addNewObject(scene, objectType) {
 }
 
 function preloadObjects() {
-  // Bike
-  const bikeMTLLoader = new THREE.MTLLoader();
-  const bikeOBJLoader = new THREE.OBJLoader();
-  bikeMTLLoader.load("models/bike/bike.mtl", function(materials) {
-    materials.preload();
-    bikeOBJLoader.setMaterials(materials);
-    bikeOBJLoader.load('models/bike/bike.obj', function(objectMesh) {
-      preloadedObjects.set('bike', {objectMesh: objectMesh, scalingFactor: 0.002});
-    });
-  });
+  loadObject('bike', {scalingFactor: 0.002});
+  loadObject('tree', {scalingFactor: 0.002});
+  loadObject('tricycle', {rotationY: Math.PI});
+  loadObject('pug');
+  loadObject('seasaw', {scalingFactor: 0.1});
+  loadObject('bench', {rotationY: Math.PI});
+  loadObject('coffee_shop', {rotationY: Math.PI});
+  loadObject('food_stand');
+}
 
-  // Tree
-  const treeMTLLoader = new THREE.MTLLoader();
-  const treeOBJLoader = new THREE.OBJLoader();
-  treeMTLLoader.load("models/tree/tree.mtl", function(materials) {
-    materials.preload();
-    treeOBJLoader.setMaterials(materials);
-    treeOBJLoader.load('models/tree/tree.obj', function(objectMesh) {
-      preloadedObjects.set('tree', {objectMesh: objectMesh, scalingFactor: 0.002});
-    });
-  });
+function loadObject(name, params = {}) {
+  const mtlLoader = new THREE.MTLLoader();
+  const objLoader = new THREE.OBJLoader();
+  const mltPath = `models/${name}/${name}.mtl`;
+  const objPath = `models/${name}/${name}.obj`;
+  const scalingFactor = params.scalingFactor || 1;
+  const rotationY = params.rotationY || 0;
 
-  // Tricycle
-  const tricycleMTLLoader = new THREE.MTLLoader();
-  const tricycleOBJLoader = new THREE.OBJLoader();
-  tricycleMTLLoader.load("models/tricycle/tricycle.mtl", function(materials) {
+  mtlLoader.load(mltPath, function(materials) {
     materials.preload();
-    tricycleOBJLoader.setMaterials(materials);
-    tricycleOBJLoader.load('models/tricycle/tricycle.obj', function(objectMesh) {
-      preloadedObjects.set('tricycle', {
+    objLoader.setMaterials(materials);
+    objLoader.load(objPath, function(objectMesh) {
+      preloadedObjects.set(name, {
         objectMesh: objectMesh,
-        scalingFactor: 1,
-        rotationY: Math.PI,
+        scalingFactor: scalingFactor,
+        rotationY: rotationY,
       });
-    });
-  });
-
-  // Pug
-  const pugMTLLoader = new THREE.MTLLoader();
-  const pugOBJLoader = new THREE.OBJLoader();
-  pugMTLLoader.load("models/pug/pug.mtl", function(materials) {
-    materials.preload();
-    pugOBJLoader.setMaterials(materials);
-    pugOBJLoader.load('models/pug/pug.obj', function(objectMesh) {
-      preloadedObjects.set('pug', {objectMesh: objectMesh, scalingFactor: 1});
-    });
-  });
-
-  // Seesaw
-  const seesawMTLLoader = new THREE.MTLLoader();
-  const seesawOBJLoader = new THREE.OBJLoader();
-  seesawMTLLoader.load("models/seasaw/seasaw.mtl", function(materials) {
-    materials.preload();
-    seesawOBJLoader.setMaterials(materials);
-    seesawOBJLoader.load('models/seasaw/seasaw.obj', function(objectMesh) {
-      preloadedObjects.set('seasaw', {objectMesh: objectMesh, scalingFactor: 0.1});
-    });
-  });
-
-  // Bench
-  const benchMTLLoader = new THREE.MTLLoader();
-  const benchOBJLoader = new THREE.OBJLoader();
-  benchMTLLoader.load("models/bench/bench.mtl", function(materials) {
-    materials.preload();
-    benchOBJLoader.setMaterials(materials);
-    benchOBJLoader.load('models/bench/bench.obj', function(objectMesh) {
-      preloadedObjects.set('bench', {
-        objectMesh: objectMesh,
-        scalingFactor: 1,
-        rotationY: Math.PI,
-      });
-    });
-  });
-
-  // Coffee Shop
-  const coffeeShopMTLLoader = new THREE.MTLLoader();
-  const coffeeShopOBJLoader = new THREE.OBJLoader();
-  coffeeShopMTLLoader.load("models/coffee_shop/coffee_shop.mtl", function(materials) {
-    materials.preload();
-    coffeeShopOBJLoader.setMaterials(materials);
-    coffeeShopOBJLoader.load('models/coffee_shop/coffee_shop.obj', function(objectMesh) {
-      preloadedObjects.set('coffee_shop', {objectMesh: objectMesh, scalingFactor: 1, rotationY: Math.PI});
-    });
-  });
-
-  // Food Stand
-  const foodStandMTLLoader = new THREE.MTLLoader();
-  const foodStandOBJLoader = new THREE.OBJLoader();
-  foodStandMTLLoader.load("models/food_stand/food_stand.mtl", function(materials) {
-    materials.preload();
-    foodStandOBJLoader.setMaterials(materials);
-    foodStandOBJLoader.load('models/food_stand/food_stand.obj', function(objectMesh) {
-      preloadedObjects.set('food_stand', {objectMesh: objectMesh, scalingFactor: 1});
     });
   });
 }
