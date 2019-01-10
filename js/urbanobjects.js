@@ -10,6 +10,7 @@ const codeToObjectMap = {
   '203': 'bench',
   '155': 'coffee_shop',
   '91': 'food_stand',
+  '151': 'scooter',
 }
 
 // Key DOM Elements
@@ -88,8 +89,8 @@ var render = function () {
         scalingFactor = preloadedObject.scalingFactor;
       }
 
-      let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 2, -5);
-      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 1) * scalingFactor;
+      let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 12, -12);
+      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 0.1) * scalingFactor;
 
       // console.log("Scaled X", scaledX);
       // console.log("Scaled Size", scaledSize);
@@ -146,6 +147,7 @@ function preloadObjects() {
   loadObject('bench', {rotationY: Math.PI});
   loadObject('coffee_shop', {rotationY: Math.PI});
   loadObject('food_stand');
+  loadObject('scooter', {rotationY: Math.PI / 2, scalingFactor: 0.05});
 }
 
 function loadObject(name, params = {}) {
