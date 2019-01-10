@@ -89,11 +89,8 @@ var render = function () {
         scalingFactor = preloadedObject.scalingFactor;
       }
 
-      let scaledX = scaleToRange(relativeX, 0, videoCanvas.width, 12, -12);
-      let scaledSize = scaleToRange(relativeY, videoCanvas.height, 0, 3, 0.1) * scalingFactor;
-
-      // console.log("Scaled X", scaledX);
-      // console.log("Scaled Size", scaledSize);
+      let scaledX = scaleToRange(relativeX, 0, threeContainerWidth, 9, -8);
+      let scaledSize = scaleToRange(relativeY, threeContainerHeight, 0, 3, 0.1) * scalingFactor;
 
       let object = urbanObjects.get(code);
       if (!object) {
@@ -145,9 +142,9 @@ function preloadObjects() {
   loadObject('pug');
   loadObject('seasaw', {scalingFactor: 0.1});
   loadObject('bench', {rotationY: Math.PI});
-  loadObject('coffee_shop', {rotationY: Math.PI});
+  loadObject('coffee_shop', {rotationY: Math.PI, scalingFactor: 2});
   loadObject('food_stand');
-  loadObject('scooter', {rotationY: Math.PI / 2, scalingFactor: 0.05});
+  loadObject('scooter', {rotationY: Math.PI / 2, scalingFactor: 0.1});
 }
 
 function loadObject(name, params = {}) {
