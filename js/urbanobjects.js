@@ -2,15 +2,20 @@
 const urbanObjects = new Map();
 const preloadedObjects = new Map();
 const codeToObjectMap = {
-  '563': 'tree',
-  '361': 'bike',
-  '421': 'tricycle',
-  '271': 'pug',
+  '563': 'tree1',
+  '611': 'tree2',
+  '421': 'bike1',
+  '199': 'bike2',
+  '361': 'tricycle',
+  '271': 'pug1',
+  '241': 'pug2',
   '313': 'seasaw',
-  '203': 'bench',
+  '203': 'bench1',
+  '93': 'bench2',
   '155': 'coffee_shop',
   '91': 'food_stand',
-  '151': 'scooter',
+  '151': 'scooter1',
+  '357': 'scooter2',
 }
 
 // Key DOM Elements
@@ -144,22 +149,29 @@ function addNewObject(scene, objectType) {
 }
 
 function preloadObjects() {
-  loadObject('bike', {scalingFactor: 0.005, yOffset: -1});
-  loadObject('tree', {scalingFactor: 0.003});
+  loadObject('bike1', {filename: 'bike', scalingFactor: 0.005, yOffset: -1});
+  loadObject('bike2', {filename: 'bike', scalingFactor: 0.005, yOffset: -1});
+  loadObject('tree1', {filename: 'tree', scalingFactor: 0.003});
+  loadObject('tree2', {filename: 'tree', scalingFactor: 0.003});
+  loadObject('tree3', {filename: 'tree', scalingFactor: 0.003});
   loadObject('tricycle', {rotationY: Math.PI / 2, scalingFactor: 0.5});
-  loadObject('pug', {scalingFactor: 0.75});
+  loadObject('pug1', {filename: 'pug', scalingFactor: 0.75});
+  loadObject('pug2', {filename: 'pug', scalingFactor: 0.75});
   loadObject('seasaw', {scalingFactor: 0.2});
-  loadObject('bench', {rotationY: Math.PI, scalingFactor: 0.8});
+  loadObject('bench1', {filename: 'bench', rotationY: Math.PI, scalingFactor: 0.8});
+  loadObject('bench2', {filename: 'bench', rotationY: Math.PI, scalingFactor: 0.8});
   loadObject('coffee_shop', {rotationY: Math.PI, scalingFactor: 2});
   loadObject('food_stand');
-  loadObject('scooter', {rotationY: Math.PI / 2, scalingFactor: 0.1});
+  loadObject('scooter1', {filename: 'scooter', rotationY: Math.PI / 2, scalingFactor: 0.1});
+  loadObject('scooter2', {filename: 'scooter', rotationY: Math.PI / 2, scalingFactor: 0.1});
 }
 
 function loadObject(name, params = {}) {
   const mtlLoader = new THREE.MTLLoader();
   const objLoader = new THREE.OBJLoader();
-  const mltPath = `models/${name}/${name}.mtl`;
-  const objPath = `models/${name}/${name}.obj`;
+  const filename = params.filename || name;
+  const mltPath = `models/${filename}/${filename}.mtl`;
+  const objPath = `models/${filename}/${filename}.obj`;
   const scalingFactor = params.scalingFactor || 1;
   const rotationY = params.rotationY || 0;
   const yOffset = params.yOffset || 0;
