@@ -99,6 +99,9 @@ var render = function () {
       }
 
       object.position.setX(scaledX);
+      if ('yOffset' in preloadedObject) {
+        object.position.setY(preloadedObject.yOffset);
+      }
       if ('rotationY' in preloadedObject) {
         object.rotation.y = preloadedObject.rotationY;
       }
@@ -129,19 +132,24 @@ setInterval(function() {
 }, 500);
 
 function addNewObject(scene, objectType) {
-  const objectMesh = preloadedObjects.get(objectType).objectMesh;
+  try {
+    const objectMesh = preloadedObjects.get(objectType).objectMesh;
 
-  scene.add(objectMesh);
-  return objectMesh;
+    scene.add(objectMesh);
+    return objectMesh;
+  } catch (exception) {
+    console.log(objectType);
+    throw(exception);
+  }
 }
 
 function preloadObjects() {
-  loadObject('bike', {scalingFactor: 0.002});
-  loadObject('tree', {scalingFactor: 0.002});
-  loadObject('tricycle', {rotationY: Math.PI});
-  loadObject('pug');
-  loadObject('seasaw', {scalingFactor: 0.1});
-  loadObject('bench', {rotationY: Math.PI});
+  loadObject('bike', {scalingFactor: 0.005, yOffset: -1});
+  loadObject('tree', {scalingFactor: 0.003});
+  loadObject('tricycle', {rotationY: Math.PI / 2, scalingFactor: 0.5});
+  loadObject('pug', {scalingFactor: 0.75});
+  loadObject('seasaw', {scalingFactor: 0.2});
+  loadObject('bench', {rotationY: Math.PI, scalingFactor: 0.8});
   loadObject('coffee_shop', {rotationY: Math.PI, scalingFactor: 2});
   loadObject('food_stand');
   loadObject('scooter', {rotationY: Math.PI / 2, scalingFactor: 0.1});
@@ -154,6 +162,7 @@ function loadObject(name, params = {}) {
   const objPath = `models/${name}/${name}.obj`;
   const scalingFactor = params.scalingFactor || 1;
   const rotationY = params.rotationY || 0;
+  const yOffset = params.yOffset || 0;
 
   mtlLoader.load(mltPath, function(materials) {
     materials.preload();
@@ -163,6 +172,7 @@ function loadObject(name, params = {}) {
         objectMesh: objectMesh,
         scalingFactor: scalingFactor,
         rotationY: rotationY,
+        yOffset: yOffset,
       });
     });
   });
